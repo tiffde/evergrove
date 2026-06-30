@@ -1,129 +1,241 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Evergrove Schedule</title>
+
 <style>
-body {
-  margin: 0;
-  padding: 10px;
-  background: transparent;
-  font-family: Times New Roman, serif;
-  color: #5f4b36;
+
+html,
+body{
+    margin:0;
+    padding:0;
+    background:transparent !important;
+    font-family:"Times New Roman", Times, serif;
+    color:#5f4b36;
 }
 
-.row {
-  display: flex;
-  align-items: center;
-  margin-bottom: 7px;
-  gap: 6px;
+*{
+    box-sizing:border-box;
 }
 
-.time {
-  width: 62px;
-  padding: 4px 6px;
-  border: 1px solid #d8c49b;
-  background: #fffaf0;
-  color: #9a7b4f;
-  text-align: center;
-  font-weight: bold;
-  border-radius: 2px;
-  font-size: 14px;
-  font-family: Times New Roman, serif;
+body{
+    padding:10px;
 }
 
-.time.active {
-  background: #c8ad7f;
-  color: white;
+#schedule{
+    background:transparent;
 }
 
-.task {
-  border: none;
-  background: transparent;
-  font-family: Times New Roman, serif;
-  color: #5f4b36;
-  font-size: 14px;
-  width: 160px;
+.row{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    margin-bottom:8px;
+    background:transparent;
+}
+
+.time{
+
+    width:68px;
+
+    padding:5px 6px;
+
+    text-align:center;
+
+    border:1px solid #d8c49b;
+
+    border-radius:4px;
+
+    background:#fffaf0;
+
+    color:#9a7b4f;
+
+    font-family:"Times New Roman", Times, serif;
+
+    font-size:14px;
+
+    font-weight:bold;
+
+}
+
+.time.active{
+
+    background:#c8ad7f;
+
+    color:white;
+
+}
+
+.task{
+
+    width:170px;
+
+    border:none;
+
+    background:transparent;
+
+    color:#5f4b36;
+
+    font-family:"Times New Roman", Times, serif;
+
+    font-size:15px;
+
 }
 
 .task:focus,
-.time:focus {
-  outline: 1px solid #c8ad7f;
+.time:focus{
+
+    outline:1px solid #c8ad7f;
+
 }
 
-button {
-  margin-top: 6px;
-  border: 1px solid #d8c49b;
-  background: #f7efe1;
-  color: #7b6243;
-  font-family: Times New Roman, serif;
-  padding: 4px 8px;
-  cursor: pointer;
+button{
+
+    margin-top:8px;
+
+    padding:5px 10px;
+
+    background:#f7efe1;
+
+    border:1px solid #d8c49b;
+
+    color:#7b6243;
+
+    border-radius:4px;
+
+    cursor:pointer;
+
+    font-family:"Times New Roman", Times, serif;
+
+    font-size:14px;
+
 }
+
+button:hover{
+
+    background:#efe4d0;
+
+}
+
 </style>
+
 </head>
 
 <body>
 
 <div id="schedule"></div>
-<button onclick="addRow()">+ add time</button>
+
+<button onclick="addRow()">+ Add Time</button>
 
 <script>
+
 let schedule = JSON.parse(localStorage.getItem("evergroveSchedule")) || [
-  { time: "09:30", task: "wake up", active: true },
-  { time: "10:00", task: "work", active: false },
-  { time: "11:00", task: "focus block", active: false },
-  { time: "01:00", task: "lunch", active: true },
-  { time: "03:00", task: "reset", active: false },
-  { time: "05:00", task: "walk", active: false },
-  { time: "07:00", task: "dinner", active: true }
+
+{ time:"09:30", task:"Wake up", active:true },
+
+{ time:"10:00", task:"Work", active:false },
+
+{ time:"11:00", task:"Focus Block", active:false },
+
+{ time:"01:00", task:"Lunch", active:true },
+
+{ time:"03:00", task:"Reset", active:false },
+
+{ time:"05:00", task:"Walk", active:false },
+
+{ time:"07:00", task:"Dinner", active:true }
+
 ];
 
-function save() {
-  localStorage.setItem("evergroveSchedule", JSON.stringify(schedule));
+function save(){
+
+    localStorage.setItem("evergroveSchedule",JSON.stringify(schedule));
+
 }
 
-function render() {
-  const container = document.getElementById("schedule");
-  container.innerHTML = "";
+function render(){
 
-  schedule.forEach((item, index) => {
-    const row = document.createElement("div");
-    row.className = "row";
+    const container=document.getElementById("schedule");
 
-    const time = document.createElement("input");
-    time.className = "time" + (item.active ? " active" : "");
-    time.value = item.time;
-    time.oninput = e => {
-      schedule[index].time = e.target.value;
-      save();
-    };
-    time.ondblclick = () => {
-      schedule[index].active = !schedule[index].active;
-      save();
-      render();
-    };
+    container.innerHTML="";
 
-    const task = document.createElement("input");
-    task.className = "task";
-    task.value = item.task;
-    task.oninput = e => {
-      schedule[index].task = e.target.value;
-      save();
-    };
+    schedule.forEach((item,index)=>{
 
-    row.appendChild(time);
-    row.appendChild(task);
-    container.appendChild(row);
-  });
+        const row=document.createElement("div");
+
+        row.className="row";
+
+        const time=document.createElement("input");
+
+        time.className="time"+(item.active?" active":"");
+
+        time.value=item.time;
+
+        time.oninput=e=>{
+
+            schedule[index].time=e.target.value;
+
+            save();
+
+        };
+
+        time.ondblclick=()=>{
+
+            schedule[index].active=!schedule[index].active;
+
+            save();
+
+            render();
+
+        };
+
+        const task=document.createElement("input");
+
+        task.className="task";
+
+        task.value=item.task;
+
+        task.oninput=e=>{
+
+            schedule[index].task=e.target.value;
+
+            save();
+
+        };
+
+        row.appendChild(time);
+
+        row.appendChild(task);
+
+        container.appendChild(row);
+
+    });
+
 }
 
-function addRow() {
-  schedule.push({ time: "00:00", task: "new task", active: false });
-  save();
-  render();
+function addRow(){
+
+    schedule.push({
+
+        time:"00:00",
+
+        task:"New Task",
+
+        active:false
+
+    });
+
+    save();
+
+    render();
+
 }
 
 render();
+
 </script>
 
 </body>
