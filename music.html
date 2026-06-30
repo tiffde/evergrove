@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Evergrove Music Player</title>
+
+<style>
+html, body {
+  margin: 0;
+  padding: 0;
+  background: #fffaf0;
+  font-family: "Times New Roman", Times, serif;
+  color: #5f4b36;
+}
+
+* { box-sizing: border-box; }
+
+.player {
+  width: 320px;
+  padding: 18px;
+  text-align: center;
+  background: #fff4df;
+  border: 1px solid #d8c49b;
+  border-radius: 18px;
+}
+
+.title {
+  font-style: italic;
+  font-size: 18px;
+  margin-bottom: 10px;
+}
+
+.record-area {
+  position: relative;
+  height: 150px;
+  margin: 10px auto 15px;
+}
+
+.record {
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #e7b4aa 0 18%, #222 19% 70%, #111 71%);
+  margin: auto;
+  box-shadow: inset 0 0 0 5px #333;
+}
+
+.arm {
+  position: absolute;
+  width: 95px;
+  height: 6px;
+  background: #b68b45;
+  top: 35px;
+  right: 38px;
+  transform: rotate(28deg);
+  transform-origin: right center;
+  border-radius: 10px;
+}
+
+.song {
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.artist {
+  color: #b77d6c;
+  font-size: 18px;
+  margin-top: 4px;
+}
+
+.divider {
+  margin: 12px auto;
+  width: 160px;
+  border-top: 1px solid #d8c49b;
+}
+
+.controls {
+  display: flex;
+  justify-content: center;
+  gap: 18px;
+  margin: 14px 0;
+  font-size: 24px;
+}
+
+button {
+  border: 1px solid #d8c49b;
+  background: #f7efe1;
+  color: #7b6243;
+  font-family: "Times New Roman", Times, serif;
+  padding: 6px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #efe4d0;
+}
+</style>
+</head>
+
+<body>
+
+<div class="player">
+  <div class="title">now playing</div>
+
+  <div class="song">Euclid</div>
+  <div class="artist">Sleep Token</div>
+
+  <div class="divider"></div>
+
+  <div class="record-area">
+    <div class="record"></div>
+    <div class="arm"></div>
+  </div>
+
+  <div class="controls">
+    <span>⏮</span>
+    <span>⏸</span>
+    <span>⏭</span>
+  </div>
+
+  <a href="https://open.spotify.com" target="_blank">
+    <button>open in spotify</button>
+  </a>
+</div>
+
+</body>
+</html>
