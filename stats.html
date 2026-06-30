@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Evergrove Daily Stats</title>
+
+<style>
+html, body {
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  font-family: "Times New Roman", Times, serif;
+  color: #5f4b36;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  padding: 10px;
+}
+
+.widget {
+  width: 100%;
+  max-width: 330px;
+}
+
+.title {
+  text-align: center;
+  font-style: italic;
+  font-size: 16px;
+  margin-bottom: 12px;
+  color: #5f4b36;
+}
+
+.stat {
+  margin-bottom: 14px;
+}
+
+.label-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 5px;
+  font-size: 14px;
+}
+
+.label {
+  font-style: italic;
+}
+
+.value {
+  font-size: 13px;
+  color: #8a6f4d;
+}
+
+.progress-bg {
+  width: 100%;
+  height: 15px;
+  background: #fffaf0;
+  border: 1px solid #d8c49b;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  width: 0%;
+  background: #c8ad7f;
+  transition: width 0.25s ease;
+}
+
+.controls {
+  display: flex;
+  gap: 5px;
+  margin-top: 5px;
+}
+
+button {
+  border: 1px solid #d8c49b;
+  background: #f7efe1;
+  color: #7b6243;
+  font-family: "Times New Roman", Times, serif;
+  font-size: 13px;
+  padding: 2px 7px;
+  cursor: pointer;
+  border-radius: 3px;
+}
+
+button:hover {
+  background: #efe4d0;
+}
+
+.reset {
+  margin-top: 8px;
+  width: 100%;
+}
+</style>
+</head>
+
+<body>
+
+<div class="widget">
+  <div class="title">stats</div>
+
+  <div class="stat">
+    <div class="label-row">
+      <div class="label">💧 Hydration</div>
+      <div class="value" id="hydration-value"></div>
+    </div>
+    <div class="progress-bg">
+      <div class="progress-fill" id="hydration-bar"></div>
+    </div>
+    <div class="controls">
+      <button onclick="changeStat('hydration', -8)">-8 oz</button>
+      <button onclick="changeStat('hydration', 8)">+8 oz</button>
+    </div>
+  </div>
+
+  <div class="stat">
+    <div class="label-row">
+      <div class="label">🌙 Rest</div>
+      <div class="value" id="rest-value"></div>
+    </div>
+    <div class="progress-bg">
+      <div class="progress-fill" id="rest-bar"></div>
+    </div>
+    <div class="controls">
+      <button onclick="changeStat('rest', -0.5)">-0.5 hr</button>
+      <button onclick="changeStat('rest', 0.5)">+0.5 hr</button>
+    </div>
+  </div>
+
+  <div class="stat">
+    <div class="label-row">
+      <div class="label">🌿 Movement</div>
+      <div class="value" id="movement-value"></div>
+    </div>
+    <div class="progress-bg">
+      <div class="progress-fill" id="movement-bar"></div>
+    </div>
+    <div class="controls">
+      <button onclick="changeStat('movement', -5)">-5 min</button>
+      <button onclick="changeStat('movement', 5)">+5 min</button>
+    </div>
+  </div>
+
+  <button class="reset" onclick="resetStats()">reset day</button>
+</div>
+
+<script>
+const goals = {
+  hydration: 120,
+  rest: 8,
+  movement: 30
+};
+
+let stats = JSON.parse(localStorage.getItem("evergroveDailyStats")) || {
+  hydration: 0,
+  rest: 0,
+  movement: 0
+};
+
+function saveStats() {
+  localStorage.setItem("evergroveDailyStats", JSON.stringify(stats));
+}
+
+function changeStat(stat, amount) {
+  stats[stat] = Math.max(0, Math.min(goals[stat], stats[stat] + amount));
+  saveStats();
+  renderStats();
+}
+
+function resetStats() {
+  stats = {
+    hydration: 0,
+    rest: 0,
+    movement: 0
+  };
+  saveStats();
+  renderStats();
+}
+
+function renderStats() {
+  updateStat("hydration", "oz");
+  updateStat("rest", "hrs");
+  updateStat("movement", "min");
+}
+
+function updateStat(stat, unit) {
+  const percent = Math.min(100, (stats[stat] / goals[stat]) * 100);
+
+  document.getElementById(`${stat}-bar`).style.width = percent + "%";
+  document.getElementById(`${stat}-value`).textContent =
+    `${stats[stat]} / ${goals[stat]} ${unit}`;
+}
+
+renderStats();
+</script>
+
+</body>
+</html>
