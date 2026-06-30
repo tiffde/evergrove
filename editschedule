@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+body {
+  margin: 0;
+  padding: 10px;
+  background: transparent;
+  font-family: Georgia, serif;
+  color: #5f4b36;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 7px;
+  gap: 6px;
+}
+
+.time {
+  width: 62px;
+  padding: 4px 6px;
+  border: 1px solid #d8c49b;
+  background: #fffaf0;
+  color: #9a7b4f;
+  text-align: center;
+  font-weight: bold;
+  border-radius: 2px;
+  font-size: 14px;
+  font-family: Georgia, serif;
+}
+
+.time.active {
+  background: #c8ad7f;
+  color: white;
+}
+
+.task {
+  border: none;
+  background: transparent;
+  font-family: Georgia, serif;
+  color: #5f4b36;
+  font-size: 14px;
+  width: 160px;
+}
+
+.task:focus,
+.time:focus {
+  outline: 1px solid #c8ad7f;
+}
+
+button {
+  margin-top: 6px;
+  border: 1px solid #d8c49b;
+  background: #f7efe1;
+  color: #7b6243;
+  font-family: Georgia, serif;
+  padding: 4px 8px;
+  cursor: pointer;
+}
+</style>
+</head>
+
+<body>
+
+<div id="schedule"></div>
+<button onclick="addRow()">+ add time</button>
+
+<script>
+let schedule = JSON.parse(localStorage.getItem("evergroveSchedule")) || [
+  { time: "09:30", task: "wake up", active: true },
+  { time: "10:00", task: "work", active: false },
+  { time: "11:00", task: "focus block", active: false },
+  { time: "01:00", task: "lunch", active: true },
+  { time: "03:00", task: "reset", active: false },
+  { time: "05:00", task: "walk", active: false },
+  { time: "07:00", task: "dinner", active: true }
+];
+
+function save() {
+  localStorage.setItem("evergroveSchedule", JSON.stringify(schedule));
+}
+
+function render() {
+  const container = document.getElementById("schedule");
+  container.innerHTML = "";
+
+  schedule.forEach((item, index) => {
+    const row = document.createElement("div");
+    row.className = "row";
+
+    const time = document.createElement("input");
+    time.className = "time" + (item.active ? " active" : "");
+    time.value = item.time;
+    time.oninput = e => {
+      schedule[index].time = e.target.value;
+      save();
+    };
+    time.ondblclick = () => {
+      schedule[index].active = !schedule[index].active;
+      save();
+      render();
+    };
+
+    const task = document.createElement("input");
+    task.className = "task";
+    task.value = item.task;
+    task.oninput = e => {
+      schedule[index].task = e.target.value;
+      save();
+    };
+
+    row.appendChild(time);
+    row.appendChild(task);
+    container.appendChild(row);
+  });
+}
+
+function addRow() {
+  schedule.push({ time: "00:00", task: "new task", active: false });
+  save();
+  render();
+}
+
+render();
+</script>
+
+</body>
+</html>
