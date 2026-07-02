@@ -161,7 +161,6 @@ function render(){
         const icon = document.createElement("input");
         icon.className = "icon";
         icon.value = item.icon;
-        icon.maxLength = 4;
 
         icon.oninput = e=>{
             schedule[index].icon = e.target.value;
