@@ -139,7 +139,7 @@ body { padding: 14px; }
 
 .row {
   display: grid;
-  grid-template-columns: 22px 48px 72px 155px 62px 24px;
+  grid-template-columns: 22px 48px 72px 140px 62px 24px;
   gap: 8px;
   align-items: center;
   margin-bottom: 8px;
@@ -155,6 +155,7 @@ body { padding: 14px; }
   color: rgba(95,75,54,.28);
   cursor: grab;
   font-size: 18px;
+  user-select: none;
 }
 
 .drag-handle:hover {
@@ -199,6 +200,7 @@ body { padding: 14px; }
 }
 
 .task {
+  width: 140px;
   border: none;
   background: transparent;
   color: #5f4b36;
@@ -229,6 +231,8 @@ body { padding: 14px; }
   color: #9a7b4f;
   font-size: 14px;
   cursor: pointer;
+  position: relative;
+  z-index: 5;
 }
 
 .removeButton:hover {
@@ -293,7 +297,7 @@ const icons = [
   "🎮","📺","🎬","🎵","🎨","🧶","🛁","🧴",
   "🪥","🍽️","🥗","☕","💧","🏊","🚶","🏃",
   "🧘","🌿","🪴","🛒","🧺","🧹","🛏️","🌙",
-  "❤️","🐈","🚗","🎁","⭐"
+  "❤️","🐈","🚗","🎁","⭐","🍲","🌅"
 ];
 
 let schedule = JSON.parse(localStorage.getItem("evergroveSchedule")) || [
@@ -423,6 +427,7 @@ function render(){
     row.draggable = true;
 
     row.ondragstart = e=>{
+      if(e.target.classList.contains("removeButton")) return;
       row.classList.add("dragging");
       e.dataTransfer.setData("text/plain", index);
     };
@@ -438,6 +443,9 @@ function render(){
     row.ondrop = e=>{
       e.preventDefault();
       const fromIndex = Number(e.dataTransfer.getData("text/plain"));
+
+      if(Number.isNaN(fromIndex)) return;
+
       const movedItem = schedule.splice(fromIndex,1)[0];
       schedule.splice(index,0,movedItem);
       save();
@@ -513,13 +521,19 @@ function render(){
     remove.className = "removeButton";
     remove.innerHTML = "×";
 
-    remove.onclick = ()=>{
-      if(confirm("Remove this quest?")){
-        schedule.splice(index,1);
-        save();
-        render();
-      }
-    };
+    remove.addEventListener("mousedown", function(e){
+      e.preventDefault();
+      e.stopPropagation();
+    });
+
+    remove.addEventListener("click", function(e){
+      e.preventDefault();
+      e.stopPropagation();
+
+      schedule.splice(index, 1);
+      save();
+      render();
+    });
 
     row.appendChild(drag);
     row.appendChild(icon);
