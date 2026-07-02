@@ -3,12 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>Evergrove Schedule</title>
 
 <style>
-html,
-body{
+html, body {
     margin:0;
     padding:0;
     background:#e8f0eb;
@@ -16,19 +14,13 @@ body{
     color:#5f4b36;
 }
 
-*{
-    box-sizing:border-box;
-}
+* { box-sizing:border-box; }
 
-body{
-    padding:10px;
-}
+body { padding:10px; }
 
-#schedule{
-    background:transparent;
-}
+#schedule { background:transparent; }
 
-.row{
+.row {
     display:flex;
     align-items:center;
     gap:8px;
@@ -36,17 +28,19 @@ body{
     background:transparent;
 }
 
-.icon{
-    width:28px;
-    padding:4px 2px;
-    text-align:center;
+.row.dragging {
+    opacity:.45;
+}
+
+.icon {
+    width:26px;
     border:none;
     background:transparent;
     font-size:16px;
-    font-family:"Times New Roman", Times, serif;
+    cursor:pointer;
 }
 
-.time{
+.time {
     width:68px;
     padding:5px 6px;
     text-align:center;
@@ -59,13 +53,18 @@ body{
     font-weight:bold;
 }
 
-.time.active{
+.time.current {
+    background:#d7b879;
+    color:white;
+}
+
+.time.completed {
     background:#c8ad7f;
     color:white;
 }
 
-.task{
-    flex:1;
+.task {
+    width:135px;
     border:none;
     background:transparent;
     color:#5f4b36;
@@ -73,13 +72,49 @@ body{
     font-size:15px;
 }
 
+.task.completed {
+    font-style:italic;
+    text-decoration:line-through;
+    opacity:.65;
+}
+
+.xp {
+    width:38px;
+    border:none;
+    background:transparent;
+    color:#9a7b4f;
+    font-family:"Times New Roman", Times, serif;
+    font-size:13px;
+    text-align:right;
+}
+
 .icon:focus,
 .task:focus,
-.time:focus{
+.time:focus,
+.xp:focus {
     outline:1px solid #c8ad7f;
 }
 
-button{
+.removeButton {
+    margin:0;
+    width:22px;
+    height:22px;
+    padding:0;
+    border-radius:50%;
+    background:#f7efe1;
+    border:1px solid #d8c49b;
+    color:#9a7b4f;
+    font-size:13px;
+    cursor:pointer;
+    flex-shrink:0;
+}
+
+.removeButton:hover {
+    background:#e7c4c4;
+    color:#7b2f2f;
+}
+
+.addButton {
     margin-top:8px;
     padding:5px 10px;
     background:#f7efe1;
@@ -91,28 +126,8 @@ button{
     font-size:14px;
 }
 
-button:hover{
+.addButton:hover {
     background:#efe4d0;
-}
-
-.removeButton{
-    margin-top:0;
-    margin-left:auto;
-    width:24px;
-    height:24px;
-    padding:0;
-    border-radius:50%;
-    background:#f7efe1;
-    border:1px solid #d8c49b;
-    color:#9a7b4f;
-    font-size:13px;
-    cursor:pointer;
-    flex-shrink:0;
-}
-
-.removeButton:hover{
-    background:#e7c4c4;
-    color:#7b2f2f;
 }
 </style>
 </head>
@@ -120,18 +135,25 @@ button:hover{
 <body>
 
 <div id="schedule"></div>
-
-<button onclick="addRow()">+ Add Time</button>
+<button class="addButton" onclick="addRow()">+ Add Time</button>
 
 <script>
+const icons = [
+    "✨","💻","🍵","📚","🧠","📝","📧","📞",
+    "🎮","📺","🎬","🎵","🎨","🧶","🛁","🧴",
+    "🪥","🍽️","🥗","☕","💧","🏊","🚶","🏃",
+    "🧘","🌿","🪴","🛒","🧺","🧹","🛏️","🌙",
+    "❤️","🐈","🚗","🎁","⭐"
+];
+
 let schedule = JSON.parse(localStorage.getItem("evergroveSchedule")) || [
-    { icon:"🌅", time:"09:30", task:"Wake Up", active:true },
-    { icon:"💻", time:"10:00", task:"Work", active:false },
-    { icon:"🧠", time:"11:00", task:"Focus Block", active:false },
-    { icon:"🍽️", time:"01:00", task:"Lunch", active:true },
-    { icon:"🌿", time:"03:00", task:"Reset", active:false },
-    { icon:"🚶", time:"05:00", task:"Walk", active:false },
-    { icon:"🍲", time:"07:00", task:"Dinner", active:true }
+    { icon:"🌅", time:"09:30", task:"Wake Up", xp:10, completed:false },
+    { icon:"💻", time:"10:00", task:"Work", xp:25, completed:false },
+    { icon:"🧠", time:"11:00", task:"Focus Block", xp:20, completed:false },
+    { icon:"🍽️", time:"01:00", task:"Lunch", xp:10, completed:false },
+    { icon:"🌿", time:"03:00", task:"Reset", xp:10, completed:false },
+    { icon:"🚶", time:"05:00", task:"Walk", xp:15, completed:false },
+    { icon:"🍲", time:"07:00", task:"Dinner", xp:10, completed:false }
 ];
 
 function normalizeOldRows(){
@@ -139,12 +161,70 @@ function normalizeOldRows(){
         icon: item.icon || "✨",
         time: item.time || "00:00",
         task: item.task || "New Task",
-        active: item.active || false
+        xp: item.xp ?? 10,
+        completed: item.completed || item.active || false
     }));
 }
 
 function save(){
     localStorage.setItem("evergroveSchedule", JSON.stringify(schedule));
+}
+
+function formatTime(value){
+    let raw = value.toLowerCase().replace(/\s/g,"");
+    let isPM = raw.includes("p");
+    let isAM = raw.includes("a");
+
+    raw = raw.replace(/[^\d]/g,"");
+
+    if(raw.length === 0) return "00:00";
+
+    let hour, min;
+
+    if(raw.length <= 2){
+        hour = parseInt(raw);
+        min = 0;
+    } else {
+        hour = parseInt(raw.slice(0, raw.length - 2));
+        min = parseInt(raw.slice(-2));
+    }
+
+    if(isPM && hour < 12) hour += 12;
+    if(isAM && hour === 12) hour = 0;
+
+    hour = Math.max(0, Math.min(23, hour));
+    min = Math.max(0, Math.min(59, min));
+
+    return String(hour).padStart(2,"0") + ":" + String(min).padStart(2,"0");
+}
+
+function timeToMinutes(time){
+    const [h,m] = time.split(":").map(Number);
+    return h * 60 + m;
+}
+
+function getCurrentIndex(){
+    const now = new Date();
+    const currentMinutes = now.getHours() * 60 + now.getMinutes();
+
+    let currentIndex = -1;
+
+    schedule.forEach((item,index)=>{
+        if(timeToMinutes(item.time) <= currentMinutes){
+            currentIndex = index;
+        }
+    });
+
+    return currentIndex;
+}
+
+function cycleIcon(index){
+    const current = schedule[index].icon;
+    const currentIndex = icons.indexOf(current);
+    const nextIndex = currentIndex === -1 ? 0 : (currentIndex + 1) % icons.length;
+    schedule[index].icon = icons[nextIndex];
+    save();
+    render();
 }
 
 function render(){
@@ -153,37 +233,62 @@ function render(){
     const container = document.getElementById("schedule");
     container.innerHTML = "";
 
+    const currentIndex = getCurrentIndex();
+
     schedule.forEach((item,index)=>{
 
         const row = document.createElement("div");
         row.className = "row";
+        row.draggable = true;
 
-        const icon = document.createElement("input");
-        icon.className = "icon";
-        icon.value = item.icon;
-
-        icon.oninput = e=>{
-            schedule[index].icon = e.target.value;
-            save();
+        row.ondragstart = e=>{
+            row.classList.add("dragging");
+            e.dataTransfer.setData("text/plain", index);
         };
 
+        row.ondragend = ()=>{
+            row.classList.remove("dragging");
+        };
+
+        row.ondragover = e=>{
+            e.preventDefault();
+        };
+
+        row.ondrop = e=>{
+            e.preventDefault();
+            const fromIndex = Number(e.dataTransfer.getData("text/plain"));
+            const movedItem = schedule.splice(fromIndex,1)[0];
+            schedule.splice(index,0,movedItem);
+            save();
+            render();
+        };
+
+        const icon = document.createElement("button");
+        icon.className = "icon";
+        icon.textContent = item.icon;
+        icon.onclick = ()=>cycleIcon(index);
+
         const time = document.createElement("input");
-        time.className = "time" + (item.active ? " active" : "");
+        time.className = "time";
+        if(index === currentIndex && !item.completed) time.classList.add("current");
+        if(item.completed) time.classList.add("completed");
+
         time.value = item.time;
 
-        time.oninput = e=>{
-            schedule[index].time = e.target.value;
+        time.onchange = e=>{
+            schedule[index].time = formatTime(e.target.value);
             save();
+            render();
         };
 
         time.ondblclick = ()=>{
-            schedule[index].active = !schedule[index].active;
+            schedule[index].completed = !schedule[index].completed;
             save();
             render();
         };
 
         const task = document.createElement("input");
-        task.className = "task";
+        task.className = "task" + (item.completed ? " completed" : "");
         task.value = item.task;
 
         task.oninput = e=>{
@@ -191,9 +296,20 @@ function render(){
             save();
         };
 
+        const xp = document.createElement("input");
+        xp.className = "xp";
+        xp.value = "+" + item.xp + " XP";
+
+        xp.onchange = e=>{
+            const cleaned = e.target.value.replace(/[^\d]/g,"");
+            schedule[index].xp = cleaned ? Number(cleaned) : 0;
+            save();
+            render();
+        };
+
         const remove = document.createElement("button");
         remove.className = "removeButton";
-        remove.innerHTML = "✕";
+        remove.innerHTML = "×";
 
         remove.onclick = ()=>{
             if(confirm("Remove this time block?")){
@@ -206,6 +322,7 @@ function render(){
         row.appendChild(icon);
         row.appendChild(time);
         row.appendChild(task);
+        row.appendChild(xp);
         row.appendChild(remove);
 
         container.appendChild(row);
@@ -219,7 +336,8 @@ function addRow(){
         icon:"✨",
         time:"00:00",
         task:"New Task",
-        active:false
+        xp:10,
+        completed:false
     });
 
     save();
