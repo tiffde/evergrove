@@ -3,345 +3,507 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Evergrove Schedule</title>
+<title>Evergrove Active Quests</title>
 
 <style>
 html, body {
-    margin:0;
-    padding:0;
-    background:#e8f0eb;
-    font-family:"Times New Roman", Times, serif;
-    color:#5f4b36;
+  margin: 0;
+  padding: 0;
+  background: #e8f0eb;
+  font-family: "Times New Roman", Times, serif;
+  color: #5f4b36;
 }
 
-* { box-sizing:border-box; }
+* { box-sizing: border-box; }
 
-body { padding:10px; }
+body { padding: 14px; }
 
-#schedule { background:transparent; }
+.widget {
+  width: 100%;
+  background: #e8f0eb;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-style: italic;
+  font-size: 19px;
+  margin-bottom: 12px;
+}
+
+.divider {
+  border-top: 1px solid rgba(95, 75, 54, 0.22);
+  margin: 12px 0;
+}
+
+.xp-panel {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 14px;
+  background: rgba(255, 250, 240, 0.45);
+  border-radius: 14px;
+  margin-bottom: 14px;
+}
+
+.bottle-wrap {
+  width: 85px;
+  text-align: center;
+}
+
+.bottle {
+  position: relative;
+  width: 62px;
+  height: 88px;
+  margin: 0 auto;
+  border: 3px solid #c9aa82;
+  border-radius: 28px 28px 18px 18px;
+  background: rgba(255,255,255,0.55);
+  overflow: hidden;
+  box-shadow: inset 0 0 8px rgba(255,255,255,.8);
+}
+
+.bottle-neck {
+  width: 26px;
+  height: 20px;
+  margin: 0 auto -3px;
+  border: 3px solid #c9aa82;
+  border-bottom: none;
+  background: rgba(255,255,255,0.65);
+  border-radius: 8px 8px 2px 2px;
+}
+
+.dust {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 0%;
+  background:
+    radial-gradient(circle, rgba(255,255,255,.9) 1px, transparent 2px),
+    linear-gradient(180deg, #f7b8ca, #eaa2bb);
+  background-size: 10px 10px, 100% 100%;
+  transition: height .35s ease;
+}
+
+.sparkle {
+  font-size: 12px;
+  color: #d89ba9;
+}
+
+.xp-info {
+  flex: 1;
+  text-align: center;
+}
+
+.xp-title {
+  font-style: italic;
+  font-size: 18px;
+  margin-bottom: 8px;
+}
+
+.progress {
+  width: 100%;
+  height: 22px;
+  border: 2px solid #c9aa82;
+  border-radius: 18px;
+  background: #fffaf0;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  width: 0%;
+  background:
+    radial-gradient(circle, rgba(255,255,255,.9) 1px, transparent 2px),
+    linear-gradient(90deg, #f6b2c8, #eaa2bb);
+  background-size: 10px 10px, 100% 100%;
+  transition: width .35s ease;
+}
+
+.xp-count {
+  font-size: 26px;
+  margin-top: 10px;
+}
+
+.quest-count {
+  font-style: italic;
+  font-size: 15px;
+  color: #7b6243;
+}
 
 .row {
-    display:flex;
-    align-items:center;
-    gap:8px;
-    margin-bottom:8px;
-    background:transparent;
+  display: grid;
+  grid-template-columns: 26px 78px 72px 1fr 52px 24px;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 8px;
 }
 
-.row.dragging {
-    opacity:.45;
+.row.dragging { opacity: .45; }
+
+.drag-handle {
+  color: rgba(95,75,54,.35);
+  cursor: grab;
+  font-size: 18px;
 }
 
-.icon {
-    width:26px;
-    border:none;
-    background:transparent;
-    font-size:16px;
-    cursor:pointer;
+.icon-select,
+.time,
+.xp {
+  border: 1px solid #d8c49b;
+  border-radius: 5px;
+  background: #fffaf0;
+  color: #7b6243;
+  font-family: "Times New Roman", Times, serif;
+}
+
+.icon-select {
+  width: 72px;
+  padding: 5px;
+  font-size: 15px;
 }
 
 .time {
-    width:68px;
-    padding:5px 6px;
-    text-align:center;
-    border:1px solid #d8c49b;
-    border-radius:4px;
-    background:#fffaf0;
-    color:#9a7b4f;
-    font-family:"Times New Roman", Times, serif;
-    font-size:14px;
-    font-weight:bold;
+  width: 72px;
+  padding: 6px;
+  text-align: center;
+  font-weight: bold;
+  font-size: 15px;
 }
 
 .time.current {
-    background:#d7b879;
-    color:white;
+  background: #d7b879;
+  color: white;
 }
 
 .time.completed {
-    background:#c8ad7f;
-    color:white;
+  background: #c8ad7f;
+  color: white;
 }
 
 .task {
-    width:135px;
-    border:none;
-    background:transparent;
-    color:#5f4b36;
-    font-family:"Times New Roman", Times, serif;
-    font-size:15px;
+  border: none;
+  background: transparent;
+  color: #5f4b36;
+  font-family: "Times New Roman", Times, serif;
+  font-size: 16px;
 }
 
 .task.completed {
-    font-style:italic;
-    text-decoration:line-through;
-    opacity:.65;
+  font-style: italic;
+  text-decoration: line-through;
+  opacity: .65;
 }
 
 .xp {
-    width:38px;
-    border:none;
-    background:transparent;
-    color:#9a7b4f;
-    font-family:"Times New Roman", Times, serif;
-    font-size:13px;
-    text-align:right;
-}
-
-.icon:focus,
-.task:focus,
-.time:focus,
-.xp:focus {
-    outline:1px solid #c8ad7f;
+  width: 52px;
+  padding: 6px;
+  text-align: center;
+  font-size: 15px;
 }
 
 .removeButton {
-    margin:0;
-    width:22px;
-    height:22px;
-    padding:0;
-    border-radius:50%;
-    background:#f7efe1;
-    border:1px solid #d8c49b;
-    color:#9a7b4f;
-    font-size:13px;
-    cursor:pointer;
-    flex-shrink:0;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border-radius: 50%;
+  background: #f7efe1;
+  border: 1px solid #d8c49b;
+  color: #9a7b4f;
+  font-size: 14px;
+  cursor: pointer;
 }
 
 .removeButton:hover {
-    background:#e7c4c4;
-    color:#7b2f2f;
+  background: #e7c4c4;
+  color: #7b2f2f;
 }
 
 .addButton {
-    margin-top:8px;
-    padding:5px 10px;
-    background:#f7efe1;
-    border:1px solid #d8c49b;
-    color:#7b6243;
-    border-radius:4px;
-    cursor:pointer;
-    font-family:"Times New Roman", Times, serif;
-    font-size:14px;
+  margin-top: 8px;
+  padding: 7px 14px;
+  background: #f7efe1;
+  border: 1px solid #d8c49b;
+  color: #7b6243;
+  border-radius: 5px;
+  cursor: pointer;
+  font-family: "Times New Roman", Times, serif;
+  font-size: 16px;
 }
 
 .addButton:hover {
-    background:#efe4d0;
+  background: #efe4d0;
+}
+
+input:focus,
+select:focus {
+  outline: 1px solid #c8ad7f;
 }
 </style>
 </head>
 
 <body>
 
-<div id="schedule"></div>
-<button class="addButton" onclick="addRow()">+ Add Time</button>
+<div class="widget">
+  <div class="header">⚔️ <span>active quests</span></div>
+  <div class="divider"></div>
+
+  <div class="xp-panel">
+    <div class="bottle-wrap">
+      <div class="sparkle">✦ ✧</div>
+      <div class="bottle-neck"></div>
+      <div class="bottle">
+        <div class="dust" id="bottleDust"></div>
+      </div>
+    </div>
+
+    <div class="xp-info">
+      <div class="xp-title">fairy dust is growing...</div>
+      <div class="progress">
+        <div class="progress-fill" id="xpBar"></div>
+      </div>
+      <div class="xp-count" id="xpCount">0 / 0 XP</div>
+      <div class="quest-count" id="questCount">0 of 0 quests completed</div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div id="schedule"></div>
+
+  <button class="addButton" onclick="addRow()">+ Add Time</button>
+</div>
 
 <script>
 const icons = [
-    "✨","💻","🍵","📚","🧠","📝","📧","📞",
-    "🎮","📺","🎬","🎵","🎨","🧶","🛁","🧴",
-    "🪥","🍽️","🥗","☕","💧","🏊","🚶","🏃",
-    "🧘","🌿","🪴","🛒","🧺","🧹","🛏️","🌙",
-    "❤️","🐈","🚗","🎁","⭐"
+  "✨","💻","🍵","📚","🧠","📝","📧","📞",
+  "🎮","📺","🎬","🎵","🎨","🧶","🛁","🧴",
+  "🪥","🍽️","🥗","☕","💧","🏊","🚶","🏃",
+  "🧘","🌿","🪴","🛒","🧺","🧹","🛏️","🌙",
+  "❤️","🐈","🚗","🎁","⭐"
 ];
 
 let schedule = JSON.parse(localStorage.getItem("evergroveSchedule")) || [
-    { icon:"🌅", time:"09:30", task:"Wake Up", xp:10, completed:false },
-    { icon:"💻", time:"10:00", task:"Work", xp:25, completed:false },
-    { icon:"🧠", time:"11:00", task:"Focus Block", xp:20, completed:false },
-    { icon:"🍽️", time:"01:00", task:"Lunch", xp:10, completed:false },
-    { icon:"🌿", time:"03:00", task:"Reset", xp:10, completed:false },
-    { icon:"🚶", time:"05:00", task:"Walk", xp:15, completed:false },
-    { icon:"🍲", time:"07:00", task:"Dinner", xp:10, completed:false }
+  { icon:"🌅", time:"09:30", task:"Wake Up", xp:10, completed:false },
+  { icon:"💻", time:"10:00", task:"Work", xp:10, completed:false },
+  { icon:"🧠", time:"11:00", task:"Focus Block", xp:10, completed:false },
+  { icon:"🍽️", time:"01:00", task:"Lunch", xp:10, completed:false },
+  { icon:"🌿", time:"03:00", task:"Reset", xp:10, completed:false },
+  { icon:"🚶", time:"05:00", task:"Walk", xp:10, completed:false },
+  { icon:"🍲", time:"07:00", task:"Dinner", xp:10, completed:false }
 ];
 
 function normalizeOldRows(){
-    schedule = schedule.map(item => ({
-        icon: item.icon || "✨",
-        time: item.time || "00:00",
-        task: item.task || "New Task",
-        xp: item.xp ?? 10,
-        completed: item.completed || item.active || false
-    }));
+  schedule = schedule.map(item => ({
+    icon: item.icon || "✨",
+    time: item.time || "00:00",
+    task: item.task || "New Task",
+    xp: item.xp ?? 10,
+    completed: item.completed || false
+  }));
 }
 
 function save(){
-    localStorage.setItem("evergroveSchedule", JSON.stringify(schedule));
+  localStorage.setItem("evergroveSchedule", JSON.stringify(schedule));
 }
 
 function formatTime(value){
-    let raw = value.toLowerCase().replace(/\s/g,"");
-    let isPM = raw.includes("p");
-    let isAM = raw.includes("a");
+  let raw = value.toLowerCase().replace(/\s/g,"");
+  let isPM = raw.includes("p");
+  let isAM = raw.includes("a");
 
-    raw = raw.replace(/[^\d]/g,"");
+  raw = raw.replace(/[^\d]/g,"");
 
-    if(raw.length === 0) return "00:00";
+  if(raw.length === 0) return "00:00";
 
-    let hour, min;
+  let hour, min;
 
-    if(raw.length <= 2){
-        hour = parseInt(raw);
-        min = 0;
-    } else {
-        hour = parseInt(raw.slice(0, raw.length - 2));
-        min = parseInt(raw.slice(-2));
-    }
+  if(raw.length <= 2){
+    hour = parseInt(raw);
+    min = 0;
+  } else {
+    hour = parseInt(raw.slice(0, raw.length - 2));
+    min = parseInt(raw.slice(-2));
+  }
 
-    if(isPM && hour < 12) hour += 12;
-    if(isAM && hour === 12) hour = 0;
+  if(isPM && hour < 12) hour += 12;
+  if(isAM && hour === 12) hour = 0;
 
-    hour = Math.max(0, Math.min(23, hour));
-    min = Math.max(0, Math.min(59, min));
+  hour = Math.max(0, Math.min(23, hour));
+  min = Math.max(0, Math.min(59, min));
 
-    return String(hour).padStart(2,"0") + ":" + String(min).padStart(2,"0");
+  return String(hour).padStart(2,"0") + ":" + String(min).padStart(2,"0");
 }
 
 function timeToMinutes(time){
-    const [h,m] = time.split(":").map(Number);
-    return h * 60 + m;
+  const [h,m] = time.split(":").map(Number);
+  return h * 60 + m;
 }
 
 function getCurrentIndex(){
-    const now = new Date();
-    const currentMinutes = now.getHours() * 60 + now.getMinutes();
+  const now = new Date();
+  const currentMinutes = now.getHours() * 60 + now.getMinutes();
+  let currentIndex = -1;
 
-    let currentIndex = -1;
+  schedule.forEach((item,index)=>{
+    if(timeToMinutes(item.time) <= currentMinutes){
+      currentIndex = index;
+    }
+  });
 
-    schedule.forEach((item,index)=>{
-        if(timeToMinutes(item.time) <= currentMinutes){
-            currentIndex = index;
-        }
-    });
-
-    return currentIndex;
+  return currentIndex;
 }
 
-function cycleIcon(index){
-    const current = schedule[index].icon;
-    const currentIndex = icons.indexOf(current);
-    const nextIndex = currentIndex === -1 ? 0 : (currentIndex + 1) % icons.length;
-    schedule[index].icon = icons[nextIndex];
-    save();
-    render();
+function updateXP(){
+  const totalXP = schedule.reduce((sum,item)=>sum + Number(item.xp || 0), 0);
+  const earnedXP = schedule
+    .filter(item=>item.completed)
+    .reduce((sum,item)=>sum + Number(item.xp || 0), 0);
+
+  const totalQuests = schedule.length;
+  const completedQuests = schedule.filter(item=>item.completed).length;
+  const percent = totalXP === 0 ? 0 : Math.min(100, (earnedXP / totalXP) * 100);
+
+  document.getElementById("xpBar").style.width = percent + "%";
+  document.getElementById("bottleDust").style.height = percent + "%";
+  document.getElementById("xpCount").textContent = `${earnedXP} / ${totalXP} XP`;
+  document.getElementById("questCount").textContent = `${completedQuests} of ${totalQuests} quests completed`;
 }
 
 function render(){
-    normalizeOldRows();
+  normalizeOldRows();
 
-    const container = document.getElementById("schedule");
-    container.innerHTML = "";
+  const container = document.getElementById("schedule");
+  container.innerHTML = "";
 
-    const currentIndex = getCurrentIndex();
+  const currentIndex = getCurrentIndex();
 
-    schedule.forEach((item,index)=>{
+  schedule.forEach((item,index)=>{
+    const row = document.createElement("div");
+    row.className = "row";
+    row.draggable = true;
 
-        const row = document.createElement("div");
-        row.className = "row";
-        row.draggable = true;
+    row.ondragstart = e=>{
+      row.classList.add("dragging");
+      e.dataTransfer.setData("text/plain", index);
+    };
 
-        row.ondragstart = e=>{
-            row.classList.add("dragging");
-            e.dataTransfer.setData("text/plain", index);
-        };
+    row.ondragend = ()=>{
+      row.classList.remove("dragging");
+    };
 
-        row.ondragend = ()=>{
-            row.classList.remove("dragging");
-        };
+    row.ondragover = e=>{
+      e.preventDefault();
+    };
 
-        row.ondragover = e=>{
-            e.preventDefault();
-        };
+    row.ondrop = e=>{
+      e.preventDefault();
+      const fromIndex = Number(e.dataTransfer.getData("text/plain"));
+      const movedItem = schedule.splice(fromIndex,1)[0];
+      schedule.splice(index,0,movedItem);
+      save();
+      render();
+    };
 
-        row.ondrop = e=>{
-            e.preventDefault();
-            const fromIndex = Number(e.dataTransfer.getData("text/plain"));
-            const movedItem = schedule.splice(fromIndex,1)[0];
-            schedule.splice(index,0,movedItem);
-            save();
-            render();
-        };
+    const drag = document.createElement("div");
+    drag.className = "drag-handle";
+    drag.textContent = "⠿";
 
-        const icon = document.createElement("button");
-        icon.className = "icon";
-        icon.textContent = item.icon;
-        icon.onclick = ()=>cycleIcon(index);
+    const icon = document.createElement("select");
+    icon.className = "icon-select";
 
-        const time = document.createElement("input");
-        time.className = "time";
-        if(index === currentIndex && !item.completed) time.classList.add("current");
-        if(item.completed) time.classList.add("completed");
-
-        time.value = item.time;
-
-        time.onchange = e=>{
-            schedule[index].time = formatTime(e.target.value);
-            save();
-            render();
-        };
-
-        time.ondblclick = ()=>{
-            schedule[index].completed = !schedule[index].completed;
-            save();
-            render();
-        };
-
-        const task = document.createElement("input");
-        task.className = "task" + (item.completed ? " completed" : "");
-        task.value = item.task;
-
-        task.oninput = e=>{
-            schedule[index].task = e.target.value;
-            save();
-        };
-
-        const xp = document.createElement("input");
-        xp.className = "xp";
-        xp.value = "+" + item.xp + " XP";
-
-        xp.onchange = e=>{
-            const cleaned = e.target.value.replace(/[^\d]/g,"");
-            schedule[index].xp = cleaned ? Number(cleaned) : 0;
-            save();
-            render();
-        };
-
-        const remove = document.createElement("button");
-        remove.className = "removeButton";
-        remove.innerHTML = "×";
-
-        remove.onclick = ()=>{
-            if(confirm("Remove this time block?")){
-                schedule.splice(index,1);
-                save();
-                render();
-            }
-        };
-
-        row.appendChild(icon);
-        row.appendChild(time);
-        row.appendChild(task);
-        row.appendChild(xp);
-        row.appendChild(remove);
-
-        container.appendChild(row);
+    icons.forEach(optionIcon=>{
+      const option = document.createElement("option");
+      option.value = optionIcon;
+      option.textContent = optionIcon;
+      if(optionIcon === item.icon) option.selected = true;
+      icon.appendChild(option);
     });
 
-    save();
+    icon.onchange = e=>{
+      schedule[index].icon = e.target.value;
+      save();
+      render();
+    };
+
+    const time = document.createElement("input");
+    time.className = "time";
+    if(index === currentIndex && !item.completed) time.classList.add("current");
+    if(item.completed) time.classList.add("completed");
+
+    time.value = item.time;
+
+    time.onchange = e=>{
+      schedule[index].time = formatTime(e.target.value);
+      save();
+      render();
+    };
+
+    time.ondblclick = ()=>{
+      schedule[index].completed = !schedule[index].completed;
+      save();
+      render();
+    };
+
+    const task = document.createElement("input");
+    task.className = "task" + (item.completed ? " completed" : "");
+    task.value = item.task;
+
+    task.oninput = e=>{
+      schedule[index].task = e.target.value;
+      save();
+    };
+
+    const xp = document.createElement("input");
+    xp.className = "xp";
+    xp.value = "+" + item.xp;
+
+    xp.onchange = e=>{
+      const cleaned = e.target.value.replace(/[^\d]/g,"");
+      schedule[index].xp = cleaned ? Number(cleaned) : 0;
+      save();
+      render();
+    };
+
+    const remove = document.createElement("button");
+    remove.className = "removeButton";
+    remove.innerHTML = "×";
+
+    remove.onclick = ()=>{
+      if(confirm("Remove this quest?")){
+        schedule.splice(index,1);
+        save();
+        render();
+      }
+    };
+
+    row.appendChild(drag);
+    row.appendChild(icon);
+    row.appendChild(time);
+    row.appendChild(task);
+    row.appendChild(xp);
+    row.appendChild(remove);
+
+    container.appendChild(row);
+  });
+
+  updateXP();
+  save();
 }
 
 function addRow(){
-    schedule.push({
-        icon:"✨",
-        time:"00:00",
-        task:"New Task",
-        xp:10,
-        completed:false
-    });
+  schedule.push({
+    icon:"✨",
+    time:"00:00",
+    task:"New Task",
+    xp:10,
+    completed:false
+  });
 
-    save();
-    render();
+  save();
+  render();
 }
 
 render();
