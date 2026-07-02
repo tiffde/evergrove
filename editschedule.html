@@ -16,55 +16,82 @@ html, body {
 
 * { box-sizing: border-box; }
 
-body { padding: 14px; }
+body { padding: 10px; }
 
 .widget {
   width: 100%;
+  max-width: 390px;
   background: #e8f0eb;
-}
-
-.divider {
-  border-top: 1px solid rgba(95, 75, 54, 0.22);
-  margin: 12px 0;
 }
 
 .xp-panel {
   display: flex;
   align-items: center;
-  gap: 18px;
-  padding: 14px;
+  gap: 14px;
+  padding: 12px;
   background: rgba(255, 250, 240, 0.45);
   border-radius: 14px;
-  margin-bottom: 14px;
+  margin-bottom: 12px;
   position: relative;
   overflow: hidden;
 }
 
 .bottle-wrap {
-  width: 85px;
+  width: 78px;
   text-align: center;
   position: relative;
 }
 
-.bottle {
+.bottle-body {
   position: relative;
-  width: 62px;
-  height: 88px;
+  width: 54px;
+  height: 78px;
   margin: 0 auto;
-  border: 3px solid #c9aa82;
-  border-radius: 28px 28px 18px 18px;
-  background: rgba(255,255,255,0.55);
+  border: 2px solid #c9aa82;
+  border-radius: 26px 26px 15px 15px;
+  background: rgba(255,255,255,0.62);
   overflow: hidden;
+  box-shadow: inset 0 0 8px rgba(255,255,255,.9);
+}
+
+.bottle-body::before {
+  content: "";
+  position: absolute;
+  top: 9px;
+  left: 10px;
+  width: 12px;
+  height: 30px;
+  border-radius: 50%;
+  background: rgba(255,255,255,.45);
+  z-index: 3;
 }
 
 .bottle-neck {
-  width: 26px;
-  height: 20px;
-  margin: 0 auto -3px;
-  border: 3px solid #c9aa82;
+  width: 22px;
+  height: 18px;
+  margin: 0 auto -2px;
+  border: 2px solid #c9aa82;
   border-bottom: none;
-  background: rgba(255,255,255,0.65);
-  border-radius: 8px 8px 2px 2px;
+  background: rgba(255,255,255,0.72);
+  border-radius: 7px 7px 2px 2px;
+}
+
+.bottle-cork {
+  width: 24px;
+  height: 10px;
+  margin: 0 auto -1px;
+  background: #d7b879;
+  border: 1px solid #b8945f;
+  border-radius: 5px 5px 2px 2px;
+}
+
+.bottle-bow {
+  position: absolute;
+  top: 22px;
+  left: 53px;
+  color: #d891a2;
+  font-size: 13px;
+  transform: rotate(-18deg);
 }
 
 .dust {
@@ -76,25 +103,32 @@ body { padding: 14px; }
   background:
     radial-gradient(circle, rgba(255,255,255,.95) 1px, transparent 2px),
     linear-gradient(180deg, #f7b8ca, #eaa2bb);
-  background-size: 10px 10px, 100% 100%;
+  background-size: 9px 9px, 100% 100%;
   transition: height .45s ease;
+  animation: dustShimmer 3s linear infinite;
+}
+
+@keyframes dustShimmer {
+  from { background-position: 0 0, 0 0; }
+  to { background-position: 18px -18px, 0 0; }
 }
 
 .xp-info {
   flex: 1;
   text-align: center;
+  min-width: 0;
 }
 
 .xp-title {
   font-style: italic;
-  font-size: 18px;
-  margin-bottom: 8px;
+  font-size: 16px;
+  margin-bottom: 7px;
 }
 
 .progress {
   width: 100%;
-  height: 22px;
-  border: 2px solid #c9aa82;
+  height: 18px;
+  border: 1px solid #c9aa82;
   border-radius: 18px;
   background: #fffaf0;
   overflow: hidden;
@@ -106,25 +140,150 @@ body { padding: 14px; }
   background:
     radial-gradient(circle, rgba(255,255,255,.95) 1px, transparent 2px),
     linear-gradient(90deg, #f6b2c8, #eaa2bb);
-  background-size: 10px 10px, 100% 100%;
+  background-size: 9px 9px, 100% 100%;
   transition: width .45s ease;
+  animation: dustShimmer 3s linear infinite;
 }
 
 .xp-count {
-  font-size: 26px;
-  margin-top: 10px;
+  font-size: 23px;
+  margin-top: 8px;
 }
 
 .quest-count {
   font-style: italic;
-  font-size: 15px;
+  font-size: 14px;
   color: #7b6243;
+}
+
+.divider {
+  border-top: 1px solid rgba(95, 75, 54, 0.22);
+  margin: 10px 0;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 16px 42px 64px 112px 22px;
+  gap: 6px;
+  align-items: center;
+  margin-bottom: 6px;
+  position: relative;
+}
+
+.row.dragging { opacity: .45; }
+
+.row.completed-row {
+  opacity: .70;
+}
+
+.drag-handle {
+  color: rgba(95,75,54,.20);
+  cursor: grab;
+  font-size: 16px;
+  user-select: none;
+}
+
+.drag-handle:hover {
+  color: rgba(95,75,54,.45);
+}
+
+.icon-select {
+  width: 42px;
+  border: none;
+  background: transparent;
+  color: #5f4b36;
+  font-family: "Times New Roman", Times, serif;
+  font-size: 15px;
+  cursor: pointer;
+  padding: 2px;
+}
+
+.time {
+  width: 64px;
+  padding: 5px;
+  text-align: center;
+  border: 1px solid #d8c49b;
+  border-radius: 5px;
+  background: #fffaf0;
+  color: #7b6243;
+  font-family: "Times New Roman", Times, serif;
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.time.current {
+  background: #e0bc77;
+  color: white;
+  box-shadow: 0 0 8px rgba(224,188,119,.75);
+  animation: currentPulse 4s ease-in-out infinite;
+}
+
+@keyframes currentPulse {
+  0%, 100% { box-shadow: 0 0 5px rgba(224,188,119,.45); }
+  50% { box-shadow: 0 0 10px rgba(224,188,119,.9); }
+}
+
+.time.completed {
+  background: #c8ad7f;
+  color: white;
+}
+
+.task {
+  width: 112px;
+  border: none;
+  background: transparent;
+  color: #5f4b36;
+  font-family: "Times New Roman", Times, serif;
+  font-size: 15px;
+}
+
+.task.completed {
+  font-style: italic;
+  text-decoration: line-through;
+  opacity: .62;
+}
+
+.completed-row .icon-select {
+  opacity: .55;
+}
+
+.removeButton {
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: rgba(122, 98, 67, .42);
+  font-size: 16px;
+  cursor: pointer;
+  position: relative;
+  z-index: 5;
+}
+
+.removeButton:hover {
+  color: #9b5b63;
+  background: rgba(231,196,196,.28);
+}
+
+.addButton {
+  margin-top: 8px;
+  padding: 6px 12px;
+  background: #f7efe1;
+  border: 1px solid #d8c49b;
+  color: #7b6243;
+  border-radius: 5px;
+  cursor: pointer;
+  font-family: "Times New Roman", Times, serif;
+  font-size: 15px;
+}
+
+.addButton:hover {
+  background: #efe4d0;
 }
 
 .float-sparkle {
   position: absolute;
-  left: 42px;
-  bottom: 30px;
   color: #eaa2bb;
   font-size: 15px;
   pointer-events: none;
@@ -134,126 +293,24 @@ body { padding: 14px; }
 @keyframes sparkleFloat {
   0% { opacity: 0; transform: translateY(0) scale(.8); }
   20% { opacity: 1; }
-  100% { opacity: 0; transform: translateY(-60px) scale(1.4); }
+  100% { opacity: 0; transform: translateY(-58px) scale(1.35); }
 }
 
-.row {
-  display: grid;
-  grid-template-columns: 22px 48px 72px 140px 62px 24px;
-  gap: 8px;
-  align-items: center;
-  margin-bottom: 8px;
-}
-
-.row.dragging { opacity: .45; }
-
-.row.completed-row {
-  opacity: .72;
-}
-
-.drag-handle {
-  color: rgba(95,75,54,.28);
-  cursor: grab;
-  font-size: 18px;
-  user-select: none;
-}
-
-.drag-handle:hover {
-  color: rgba(95,75,54,.55);
-}
-
-.icon-select {
-  width: 44px;
-  border: none;
-  background: transparent;
-  color: #5f4b36;
-  font-family: "Times New Roman", Times, serif;
+.float-xp {
+  position: absolute;
+  right: 26px;
+  color: #e78cae;
   font-size: 16px;
-  cursor: pointer;
-}
-
-.time,
-.xp {
-  border: 1px solid #d8c49b;
-  border-radius: 5px;
-  background: #fffaf0;
-  color: #7b6243;
-  font-family: "Times New Roman", Times, serif;
-}
-
-.time {
-  width: 72px;
-  padding: 6px;
-  text-align: center;
   font-weight: bold;
-  font-size: 15px;
+  text-shadow: 0 0 7px rgba(255,255,255,.9);
+  pointer-events: none;
+  animation: xpFloat .9s ease-out forwards;
 }
 
-.time.current {
-  background: #d7b879;
-  color: white;
-}
-
-.time.completed {
-  background: #c8ad7f;
-  color: white;
-}
-
-.task {
-  width: 140px;
-  border: none;
-  background: transparent;
-  color: #5f4b36;
-  font-family: "Times New Roman", Times, serif;
-  font-size: 16px;
-}
-
-.task.completed {
-  font-style: italic;
-  text-decoration: line-through;
-  opacity: .65;
-}
-
-.xp {
-  width: 62px;
-  padding: 6px;
-  text-align: center;
-  font-size: 15px;
-}
-
-.removeButton {
-  width: 24px;
-  height: 24px;
-  padding: 0;
-  border-radius: 50%;
-  background: #f7efe1;
-  border: 1px solid #d8c49b;
-  color: #9a7b4f;
-  font-size: 14px;
-  cursor: pointer;
-  position: relative;
-  z-index: 5;
-}
-
-.removeButton:hover {
-  background: #e7c4c4;
-  color: #7b2f2f;
-}
-
-.addButton {
-  margin-top: 8px;
-  padding: 7px 14px;
-  background: #f7efe1;
-  border: 1px solid #d8c49b;
-  color: #7b6243;
-  border-radius: 5px;
-  cursor: pointer;
-  font-family: "Times New Roman", Times, serif;
-  font-size: 16px;
-}
-
-.addButton:hover {
-  background: #efe4d0;
+@keyframes xpFloat {
+  0% { opacity: 0; transform: translateY(8px); }
+  20% { opacity: 1; }
+  100% { opacity: 0; transform: translateY(-26px); }
 }
 
 input:focus,
@@ -266,12 +323,14 @@ select:focus {
 <body>
 
 <div class="widget">
-  <div class="xp-panel" id="xpPanel">
+  <div class="xp-panel">
     <div class="bottle-wrap" id="bottleWrap">
+      <div class="bottle-cork"></div>
       <div class="bottle-neck"></div>
-      <div class="bottle">
+      <div class="bottle-body">
         <div class="dust" id="bottleDust"></div>
       </div>
+      <div class="bottle-bow">♡</div>
     </div>
 
     <div class="xp-info">
@@ -285,9 +344,7 @@ select:focus {
   </div>
 
   <div class="divider"></div>
-
   <div id="schedule"></div>
-
   <button class="addButton" onclick="addRow()">+ Add Time</button>
 </div>
 
@@ -300,14 +357,16 @@ const icons = [
   "❤️","🐈","🚗","🎁","⭐","🍲","🌅"
 ];
 
+const XP_PER_QUEST = 10;
+
 let schedule = JSON.parse(localStorage.getItem("evergroveSchedule")) || [
-  { icon:"🌅", time:"09:30", task:"Wake Up", xp:10, completed:false },
-  { icon:"💻", time:"10:00", task:"Work", xp:10, completed:false },
-  { icon:"🧠", time:"11:00", task:"Focus Block", xp:10, completed:false },
-  { icon:"🍽️", time:"01:00", task:"Lunch", xp:10, completed:false },
-  { icon:"🌿", time:"03:00", task:"Reset", xp:10, completed:false },
-  { icon:"🚶", time:"05:00", task:"Walk", xp:10, completed:false },
-  { icon:"🍲", time:"07:00", task:"Dinner", xp:10, completed:false }
+  { icon:"🌅", time:"09:30", task:"Wake Up", completed:false },
+  { icon:"💻", time:"10:00", task:"Work", completed:false },
+  { icon:"🧠", time:"11:00", task:"Focus Block", completed:false },
+  { icon:"🍽️", time:"01:00", task:"Lunch", completed:false },
+  { icon:"🌿", time:"03:00", task:"Reset", completed:false },
+  { icon:"🚶", time:"05:00", task:"Walk", completed:false },
+  { icon:"🍲", time:"07:00", task:"Dinner", completed:false }
 ];
 
 function normalizeOldRows(){
@@ -315,7 +374,6 @@ function normalizeOldRows(){
     icon: item.icon || "✨",
     time: item.time || "00:00",
     task: item.task || "New Task",
-    xp: item.xp ?? 10,
     completed: item.completed || false
   }));
 }
@@ -378,23 +436,28 @@ function triggerSparkles(){
     const sparkle = document.createElement("div");
     sparkle.className = "float-sparkle";
     sparkle.textContent = i % 2 === 0 ? "✦" : "✧";
-    sparkle.style.left = (20 + Math.random() * 45) + "px";
-    sparkle.style.bottom = (35 + Math.random() * 25) + "px";
-    sparkle.style.animationDelay = (Math.random() * .2) + "s";
+    sparkle.style.left = (15 + Math.random() * 52) + "px";
+    sparkle.style.bottom = (34 + Math.random() * 28) + "px";
+    sparkle.style.animationDelay = (Math.random() * .18) + "s";
     bottleWrap.appendChild(sparkle);
 
     setTimeout(()=>sparkle.remove(), 1400);
   }
 }
 
-function updateXP(){
-  const totalXP = schedule.reduce((sum,item)=>sum + Number(item.xp || 0), 0);
-  const earnedXP = schedule
-    .filter(item=>item.completed)
-    .reduce((sum,item)=>sum + Number(item.xp || 0), 0);
+function triggerFloatingXP(row){
+  const xp = document.createElement("div");
+  xp.className = "float-xp";
+  xp.textContent = "+10 XP";
+  row.appendChild(xp);
+  setTimeout(()=>xp.remove(), 1000);
+}
 
+function updateXP(){
   const totalQuests = schedule.length;
   const completedQuests = schedule.filter(item=>item.completed).length;
+  const totalXP = totalQuests * XP_PER_QUEST;
+  const earnedXP = completedQuests * XP_PER_QUEST;
   const percent = totalXP === 0 ? 0 : Math.min(100, (earnedXP / totalXP) * 100);
 
   document.getElementById("xpBar").style.width = percent + "%";
@@ -443,7 +506,6 @@ function render(){
     row.ondrop = e=>{
       e.preventDefault();
       const fromIndex = Number(e.dataTransfer.getData("text/plain"));
-
       if(Number.isNaN(fromIndex)) return;
 
       const movedItem = schedule.splice(fromIndex,1)[0];
@@ -477,7 +539,6 @@ function render(){
     time.className = "time";
     if(index === currentIndex && !item.completed) time.classList.add("current");
     if(item.completed) time.classList.add("completed");
-
     time.value = item.time;
 
     time.onchange = e=>{
@@ -493,7 +554,11 @@ function render(){
       render();
 
       if(!wasCompleted){
-        setTimeout(triggerSparkles, 100);
+        setTimeout(triggerSparkles, 80);
+        setTimeout(()=>{
+          const rows = document.querySelectorAll(".row");
+          if(rows[index]) triggerFloatingXP(rows[index]);
+        }, 100);
       }
     };
 
@@ -504,17 +569,6 @@ function render(){
     task.oninput = e=>{
       schedule[index].task = e.target.value;
       save();
-    };
-
-    const xp = document.createElement("input");
-    xp.className = "xp";
-    xp.value = "+" + item.xp + " XP";
-
-    xp.onchange = e=>{
-      const cleaned = e.target.value.replace(/[^\d]/g,"");
-      schedule[index].xp = cleaned ? Number(cleaned) : 0;
-      save();
-      render();
     };
 
     const remove = document.createElement("button");
@@ -539,7 +593,6 @@ function render(){
     row.appendChild(icon);
     row.appendChild(time);
     row.appendChild(task);
-    row.appendChild(xp);
     row.appendChild(remove);
 
     container.appendChild(row);
@@ -554,7 +607,6 @@ function addRow(){
     icon:"✨",
     time:"00:00",
     task:"New Task",
-    xp:10,
     completed:false
   });
 
