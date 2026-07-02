@@ -23,15 +23,6 @@ body { padding: 14px; }
   background: #e8f0eb;
 }
 
-.header {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-style: italic;
-  font-size: 19px;
-  margin-bottom: 12px;
-}
-
 .divider {
   border-top: 1px solid rgba(95, 75, 54, 0.22);
   margin: 12px 0;
@@ -45,11 +36,14 @@ body { padding: 14px; }
   background: rgba(255, 250, 240, 0.45);
   border-radius: 14px;
   margin-bottom: 14px;
+  position: relative;
+  overflow: hidden;
 }
 
 .bottle-wrap {
   width: 85px;
   text-align: center;
+  position: relative;
 }
 
 .bottle {
@@ -61,7 +55,6 @@ body { padding: 14px; }
   border-radius: 28px 28px 18px 18px;
   background: rgba(255,255,255,0.55);
   overflow: hidden;
-  box-shadow: inset 0 0 8px rgba(255,255,255,.8);
 }
 
 .bottle-neck {
@@ -81,15 +74,10 @@ body { padding: 14px; }
   width: 100%;
   height: 0%;
   background:
-    radial-gradient(circle, rgba(255,255,255,.9) 1px, transparent 2px),
+    radial-gradient(circle, rgba(255,255,255,.95) 1px, transparent 2px),
     linear-gradient(180deg, #f7b8ca, #eaa2bb);
   background-size: 10px 10px, 100% 100%;
-  transition: height .35s ease;
-}
-
-.sparkle {
-  font-size: 12px;
-  color: #d89ba9;
+  transition: height .45s ease;
 }
 
 .xp-info {
@@ -116,10 +104,10 @@ body { padding: 14px; }
   height: 100%;
   width: 0%;
   background:
-    radial-gradient(circle, rgba(255,255,255,.9) 1px, transparent 2px),
+    radial-gradient(circle, rgba(255,255,255,.95) 1px, transparent 2px),
     linear-gradient(90deg, #f6b2c8, #eaa2bb);
   background-size: 10px 10px, 100% 100%;
-  transition: width .35s ease;
+  transition: width .45s ease;
 }
 
 .xp-count {
@@ -133,9 +121,25 @@ body { padding: 14px; }
   color: #7b6243;
 }
 
+.float-sparkle {
+  position: absolute;
+  left: 42px;
+  bottom: 30px;
+  color: #eaa2bb;
+  font-size: 15px;
+  pointer-events: none;
+  animation: sparkleFloat 1.2s ease-out forwards;
+}
+
+@keyframes sparkleFloat {
+  0% { opacity: 0; transform: translateY(0) scale(.8); }
+  20% { opacity: 1; }
+  100% { opacity: 0; transform: translateY(-60px) scale(1.4); }
+}
+
 .row {
   display: grid;
-  grid-template-columns: 26px 78px 72px 1fr 52px 24px;
+  grid-template-columns: 22px 48px 72px 155px 62px 24px;
   gap: 8px;
   align-items: center;
   margin-bottom: 8px;
@@ -143,13 +147,30 @@ body { padding: 14px; }
 
 .row.dragging { opacity: .45; }
 
+.row.completed-row {
+  opacity: .72;
+}
+
 .drag-handle {
-  color: rgba(95,75,54,.35);
+  color: rgba(95,75,54,.28);
   cursor: grab;
   font-size: 18px;
 }
 
-.icon-select,
+.drag-handle:hover {
+  color: rgba(95,75,54,.55);
+}
+
+.icon-select {
+  width: 44px;
+  border: none;
+  background: transparent;
+  color: #5f4b36;
+  font-family: "Times New Roman", Times, serif;
+  font-size: 16px;
+  cursor: pointer;
+}
+
 .time,
 .xp {
   border: 1px solid #d8c49b;
@@ -157,12 +178,6 @@ body { padding: 14px; }
   background: #fffaf0;
   color: #7b6243;
   font-family: "Times New Roman", Times, serif;
-}
-
-.icon-select {
-  width: 72px;
-  padding: 5px;
-  font-size: 15px;
 }
 
 .time {
@@ -198,7 +213,7 @@ body { padding: 14px; }
 }
 
 .xp {
-  width: 52px;
+  width: 62px;
   padding: 6px;
   text-align: center;
   font-size: 15px;
@@ -247,12 +262,8 @@ select:focus {
 <body>
 
 <div class="widget">
-  <div class="header">⚔️ <span>active quests</span></div>
-  <div class="divider"></div>
-
-  <div class="xp-panel">
-    <div class="bottle-wrap">
-      <div class="sparkle">✦ ✧</div>
+  <div class="xp-panel" id="xpPanel">
+    <div class="bottle-wrap" id="bottleWrap">
       <div class="bottle-neck"></div>
       <div class="bottle">
         <div class="dust" id="bottleDust"></div>
@@ -260,7 +271,7 @@ select:focus {
     </div>
 
     <div class="xp-info">
-      <div class="xp-title">fairy dust is growing...</div>
+      <div class="xp-title" id="xpTitle">a tiny spark is waiting...</div>
       <div class="progress">
         <div class="progress-fill" id="xpBar"></div>
       </div>
@@ -356,6 +367,22 @@ function getCurrentIndex(){
   return currentIndex;
 }
 
+function triggerSparkles(){
+  const bottleWrap = document.getElementById("bottleWrap");
+
+  for(let i = 0; i < 8; i++){
+    const sparkle = document.createElement("div");
+    sparkle.className = "float-sparkle";
+    sparkle.textContent = i % 2 === 0 ? "✦" : "✧";
+    sparkle.style.left = (20 + Math.random() * 45) + "px";
+    sparkle.style.bottom = (35 + Math.random() * 25) + "px";
+    sparkle.style.animationDelay = (Math.random() * .2) + "s";
+    bottleWrap.appendChild(sparkle);
+
+    setTimeout(()=>sparkle.remove(), 1400);
+  }
+}
+
 function updateXP(){
   const totalXP = schedule.reduce((sum,item)=>sum + Number(item.xp || 0), 0);
   const earnedXP = schedule
@@ -370,6 +397,16 @@ function updateXP(){
   document.getElementById("bottleDust").style.height = percent + "%";
   document.getElementById("xpCount").textContent = `${earnedXP} / ${totalXP} XP`;
   document.getElementById("questCount").textContent = `${completedQuests} of ${totalQuests} quests completed`;
+
+  const title = document.getElementById("xpTitle");
+
+  if(percent === 0){
+    title.textContent = "a tiny spark is waiting...";
+  } else if(percent >= 100){
+    title.textContent = "the bottle sparkles with magic.";
+  } else {
+    title.textContent = "fairy dust is growing...";
+  }
 }
 
 function render(){
@@ -382,7 +419,7 @@ function render(){
 
   schedule.forEach((item,index)=>{
     const row = document.createElement("div");
-    row.className = "row";
+    row.className = "row" + (item.completed ? " completed-row" : "");
     row.draggable = true;
 
     row.ondragstart = e=>{
@@ -442,9 +479,14 @@ function render(){
     };
 
     time.ondblclick = ()=>{
+      const wasCompleted = schedule[index].completed;
       schedule[index].completed = !schedule[index].completed;
       save();
       render();
+
+      if(!wasCompleted){
+        setTimeout(triggerSparkles, 100);
+      }
     };
 
     const task = document.createElement("input");
@@ -458,7 +500,7 @@ function render(){
 
     const xp = document.createElement("input");
     xp.className = "xp";
-    xp.value = "+" + item.xp;
+    xp.value = "+" + item.xp + " XP";
 
     xp.onchange = e=>{
       const cleaned = e.target.value.replace(/[^\d]/g,"");
